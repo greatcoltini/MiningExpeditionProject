@@ -54,7 +54,7 @@ public class MiningOperation extends Application {
 
     Button mineRockBtn, purchaseWorkerBtn, upgradePickBtn;
     Label upgradesSectionLabel;
-    TextField score, passiveIncomeLabel;
+    TextField score;
 
     public MiningOperation() throws FileNotFoundException {
     }
@@ -66,7 +66,6 @@ public class MiningOperation extends Application {
 
     private void purchaseWorker(ActionEvent e, GraphicsContext gc){
         Worker toDraw = rockFactory.addWorker();
-        toDraw.draw(gc);
     }
 
     private void upgradePick(){
@@ -79,7 +78,6 @@ public class MiningOperation extends Application {
     private void refreshView(){
         checkEnablers();
         score.setText(String.valueOf(rockFactory.getScore()));
-        passiveIncomeLabel.setText("Passive Income: " + rockFactory.getWorkerCount());
     }
 
     private void checkEnablers(){
@@ -112,12 +110,11 @@ public class MiningOperation extends Application {
         purchaseWorkerBtn = new Button("Purchase Miner!");
         upgradePickBtn = new Button("Upgrade Pickaxe!");
         upgradesSectionLabel = new Label("Upgrades and Purchases");
-        passiveIncomeLabel = new TextField("Passive Income: 0");
 
 
         // 3. Add components to the root
         root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn);
-        root.getChildren().addAll(upgradesSectionLabel, passiveIncomeLabel);
+        root.getChildren().addAll(upgradesSectionLabel);
 
         // 4. Configure the components
         mineRockBtn.setPrefWidth(64);
@@ -144,10 +141,6 @@ public class MiningOperation extends Application {
         upgradesSectionLabel.relocate(450, 0);
         upgradesSectionLabel.getStyleClass().add("border-item");
 
-        passiveIncomeLabel.setPrefWidth(128);
-        passiveIncomeLabel.relocate(oreCounterX - 32, oreCounterY + 20);
-        passiveIncomeLabel.setEditable(false);
-
         // 5. Add Listeners
         stage.setScene(scene);
         stage.show();
@@ -164,6 +157,19 @@ public class MiningOperation extends Application {
                 // increment the money once per second for each worker
                 rockFactory.miningOperation();
                 refreshView();
+
+                // redraw income
+                gc.clearRect(0, 0, 600, 300);
+                gc.strokeText(String.valueOf("Income per Second: " + rockFactory.getIncome()), 200, 200);
+
+                gc.drawImage(oreBlock, rockX, rockY);
+                gc.drawImage(bronzePick, 410, rockY - 34, 32, 32);
+                mineRockBtn.setOpacity(0);
+
+                // draw upgrades
+                for (Worker worker: rockFactory.getWorkers()){
+                    worker.draw(gc);
+                }
             }
         }, 0, 1000);
 
@@ -182,10 +188,6 @@ public class MiningOperation extends Application {
      */
     public void animate(GraphicsContext gc) {
         // YOUR CODE HERE!
-
-        gc.drawImage(oreBlock, rockX, rockY);
-        gc.drawImage(bronzePick, 410, rockY - 34, 32, 32);
-        mineRockBtn.setOpacity(0);
 
     }
 

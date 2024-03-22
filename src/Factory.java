@@ -50,6 +50,10 @@ public class Factory {
         return this.score;
     }
 
+    public int getIncome(){
+        return getWorkerCount();
+    }
+
     public int getWorkerCount(){
         return this.workers.size();
     }
