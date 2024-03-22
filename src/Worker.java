@@ -27,4 +27,20 @@ public class Worker {
 
     }
 
+    public int getX(){
+        return this.x;
+    }
+
+    public int getY(){
+        return this.y;
+    }
+
+    public int getSize(){
+        return this.size;
+    }
+
+    public String getType(){
+        return "Worker";
+    }
+
 }
