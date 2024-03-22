@@ -14,11 +14,13 @@ public class Factory {
     };
 
     private final Upgrade[] possibleUpgrades = {
-            new Upgrade("Sunglasses", 2, "Miner")
+            new Upgrade("Sunglasses", 2, "Miner"),
+            new Upgrade("Hardhat", 2, "Miner")
     };
 
     private int score;
     private int workerCount;
+    private int income;
     private ArrayList<Upgrade> upgrades;
     private ArrayList<Worker> workers;
     private Pickaxe pickaxe;
@@ -37,7 +39,8 @@ public class Factory {
         this.score += this.pickaxe.getStrength() * multiplier;
     }
 
-    public void miningOperation(){
+    public int miningOperation(){
+        this.income = 0;
         for (Worker worker: workers){
             int current_mult = 1;
             for (Upgrade upgrade: upgrades){
@@ -45,12 +48,19 @@ public class Factory {
                     current_mult *= upgrade.getMultiplier();
                 }
             }
-            this.score += worker.mine();
+            this.income += worker.mine() * current_mult;
         }
+        this.score += this.income;
+        return this.income;
     }
 
-    public void addUpgrade(Upgrade upgrade){
-        this.upgrades.add(upgrade);
+    public void addUpgrade(String upgradeName){
+        for (Upgrade upgrade: possibleUpgrades){
+            if (upgrade.getName().equalsIgnoreCase(upgradeName)){
+                this.score -= upgrade.getCost();
+                this.upgrades.add(upgrade);
+            }
+        }
     }
 
     public void upgradePickaxe(){
@@ -60,7 +70,7 @@ public class Factory {
 
     public void addWorker(){
         this.decreaseScore(this.getWorkerCost());
-        Worker newWorker = new Worker(40, 40 + 10 * this.getWorkers().size());
+        Worker newWorker = new Miner(40, 40 + 10 * this.getWorkers().size());
         this.workers.add(newWorker);
     }
 
@@ -84,7 +94,7 @@ public class Factory {
         return 10 + (25 * this.workers.size());
     }
 
-    public int getUpgradeCost(){
+    public int getPickaxeCost(){
         return getNextPickaxe().getCost();
     }
 
@@ -102,6 +112,23 @@ public class Factory {
 
     public Pickaxe getNextPickaxe(){
         return pickaxes[this.getPickaxeStrength()];
+    }
+
+    public boolean hasNextPickaxe(){
+        return pickaxes[this.getPickaxeStrength()] != null;
+    }
+
+    public Upgrade[] getPossibleUpgrades(){
+        return this.possibleUpgrades;
+    }
+
+    public Upgrade getSpecificUpgrade(String upgradeName){
+        for (Upgrade upgrade: possibleUpgrades){
+            if (upgrade.getName().equalsIgnoreCase(upgradeName)){
+                return upgrade;
+            }
+        }
+        return null;
     }
 
 }

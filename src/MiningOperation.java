@@ -11,14 +11,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BackgroundImage;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
-import javax.tools.Tool;
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -41,19 +39,22 @@ public class MiningOperation extends Application {
      */
 
     private Scene scene;
+    private Pane root;
     private ArrayList<Toast> toasts = new ArrayList<Toast>();
     private boolean shakeRock = false;
     private int timer = 0;
     private int rockX = 268;
+    private int income;
     private int baseRockX = 268;
     private int rockY = 118;
     private int baseRockY = 118;
     private int oreCounterY = 160;
     private int oreCounterX = 228;
+    private final Image minebkgd = new Image(new FileInputStream("src/assets/minebkgd.jpg"));
     private final Image oreBlock = new Image(new FileInputStream("src/assets/rock.PNG"));
     private final Image upgBkgd = new Image(new FileInputStream("src/assets/upgradebkg.png"));
     private final Image paperBkgd = new Image(new FileInputStream("src/assets/sheets.png"));
-    private final Image sunglassesUpg = new Image(new FileInputStream("src/assets/sunglassesupg.png"));
+    private final Image sunglassesUpg = new Image(new FileInputStream("src/assets/sunglassesUpgrade.png"));
     /**
      *
      */
@@ -77,23 +78,39 @@ public class MiningOperation extends Application {
     private void purchaseWorker(ActionEvent e){
         toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getWorkerCost(), Color.RED));
         rockFactory.addWorker();
-
     }
 
     private void upgradePick(ActionEvent e){
-        rockFactory.upgradePickaxe();
-        scene.setCursor(new ImageCursor(rockFactory.getPickaxe().getImage(), 32, 32));
-        refreshView();
+        if (rockFactory.hasNextPickaxe()){
+            toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
+            rockFactory.upgradePickaxe();
+            scene.setCursor(new ImageCursor(rockFactory.getPickaxe().getImage(), 32, 32));
+            refreshView();
+        }
+    }
+
+    private void purchaseUpgrade(ImageView img, String upgradeName){
+        int missing_price = rockFactory.getSpecificUpgrade(upgradeName).getCost() - rockFactory.getScore();
+        if (missing_price <= 0){
+            rockFactory.addUpgrade(upgradeName);
+            root.getChildren().remove(img);
+        }
+        else {
+            toasts.add(new Toast(baseRockX, baseRockY, "Text", "Need " + missing_price, Color.PURPLE));
+        }
+
     }
 
     private void refreshView(){
         checkEnablers();
         purchaseWorkerBtn.setTooltip(new Tooltip("Costs " + rockFactory.getWorkerCost()));
+        upgradePickBtn.setText("Upgrade Pick : $" + rockFactory.getPickaxeCost());
+        purchaseWorkerBtn.setText("Purchase Worker : $" + rockFactory.getWorkerCost());
         score.setText(String.valueOf(rockFactory.getScore()));
     }
 
     private void checkEnablers(){
-        upgradePickBtn.setDisable(rockFactory.getScore() < rockFactory.getUpgradeCost());
+        upgradePickBtn.setDisable(rockFactory.getScore() < rockFactory.getPickaxeCost());
         purchaseWorkerBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost());
     }
 
@@ -107,7 +124,7 @@ public class MiningOperation extends Application {
     public void start(Stage stage) throws FileNotFoundException {
         stage.setTitle("Section 1.4 Animated!"); // window title here
         Canvas canvas = new Canvas(600, 300); // canvas size here
-        Pane root = new Pane();
+        root = new Pane();
         scene = new Scene(root, 600, 300);
         scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("miningoperation.css")).toExternalForm());
 
@@ -123,9 +140,20 @@ public class MiningOperation extends Application {
         buildingsSectionLabel = new Label("Buildings");
 
 
+        ImageView test = new ImageView(sunglassesUpg);
+        test.setPickOnBounds(true);
+        test.relocate(442, 185);
+        test.resize(16, 16);
+        Tooltip t = new Tooltip("Miner Sunglasses $" + rockFactory.getSpecificUpgrade("Sunglasses").getCost()
+        + "\nDoubles Miner efficiency");
+        Tooltip.install(test, t);
+        test.setOnMouseEntered((event) -> {test.setOpacity(0.5);});
+        test.setOnMouseExited((event) -> {test.setOpacity(1);});
+        test.setOnMouseClicked((event) -> {purchaseUpgrade(test, "Sunglasses");});
+
         // 3. Add components to the root
         root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn);
-        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel);
+        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, test);
 
         // 4. Configure the components
         mineRockBtn.setPrefWidth(64);
@@ -162,6 +190,9 @@ public class MiningOperation extends Application {
         upgradePickBtn.setOnAction(this::upgradePick);
         purchaseWorkerBtn.setOnAction(this::purchaseWorker);
 
+
+
+
         Timer gameLoop = new Timer();
         gameLoop.schedule(new TimerTask() {
             @Override
@@ -170,7 +201,7 @@ public class MiningOperation extends Application {
                     // Game logic and UI updates here
                     // Ensure that UI updates are done on the JavaFX Application Thread
                     if (timer >= 10) {
-                        rockFactory.miningOperation();
+                        income = rockFactory.miningOperation();
                         timer = 0;
                     }
 
@@ -178,9 +209,10 @@ public class MiningOperation extends Application {
 
 
                     gc.clearRect(0, 0, 600, 300);
+                    gc.drawImage(minebkgd, 0,0, 600, 300);
                     // Redraw income
                     gc.drawImage(paperBkgd, 0, 0, 100, 200);
-                    gc.strokeText("Income per Second: " + rockFactory.getIncome(), 235, 200);
+                    gc.strokeText("Income per Second: " + income, 235, 200);
 
                     if (shakeRock) {
                         gc.drawImage(oreBlock, rockX + Math.random(), rockY + Math.random());
@@ -191,10 +223,6 @@ public class MiningOperation extends Application {
 
                     gc.drawImage(upgBkgd, 410, 185, 32, 32);
                     gc.drawImage(rockFactory.getNextPickaxe().getImage(), 410, 185, 32, 32);
-
-                    gc.drawImage(upgBkgd, 442, 185, 32, 32);
-                    gc.drawImage(sunglassesUpg, 442, 185, 32, 32);
-
 
                     mineRockBtn.setOpacity(0);
 
