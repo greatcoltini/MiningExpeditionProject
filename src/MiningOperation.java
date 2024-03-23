@@ -55,6 +55,7 @@ public class MiningOperation extends Application {
     private final Image upgBkgd = new Image(new FileInputStream("src/assets/upgradebkg.png"));
     private final Image paperBkgd = new Image(new FileInputStream("src/assets/sheets.png"));
     private final Image sunglassesUpg = new Image(new FileInputStream("src/assets/sunglassesUpgrade.png"));
+    private final Image laserUpg = new Image(new FileInputStream("src/assets/laserUpgrade.png"));
     /**
      *
      */
@@ -158,9 +159,18 @@ public class MiningOperation extends Application {
         test.setOnMouseExited((event) -> {test.setOpacity(1);});
         test.setOnMouseClicked((event) -> {purchaseUpgrade(test, "Sunglasses");});
 
+        UpgradeImageView laserUpgImage = new UpgradeImageView(490, 185, 16, 16, laserUpg);
+        Tooltip las = new Tooltip("Laser Sights $" + rockFactory.getSpecificUpgrade("Laser").getCost()
+        + "\nDoubles Drill efficiency");
+        Tooltip.install(laserUpgImage, las);
+        laserUpgImage.setOnMouseEntered((event) -> {
+            laserUpgImage.setOpacity(0.5);});
+        laserUpgImage.setOnMouseExited((event) -> {laserUpgImage.setOpacity(1);});
+        laserUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(laserUpgImage, "Laser");});
+
         // 3. Add components to the root
         root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn);
-        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, test);
+        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, test, laserUpgImage);
 
         // 4. Configure the components
         mineRockBtn.setPrefWidth(64);

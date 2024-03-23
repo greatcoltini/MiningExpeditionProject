@@ -11,6 +11,13 @@ public class Upgrade {
         this.cost = 100;
     }
 
+    public Upgrade(String name, int multiplier, String type, int cost){
+        this.name = name;
+        this.multiplier = multiplier;
+        this.type = type;
+        this.cost = cost;
+    }
+
     public int getMultiplier(){
         return this.multiplier;
     }

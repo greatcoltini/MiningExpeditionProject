@@ -15,7 +15,8 @@ public class Factory {
 
     private final Upgrade[] possibleUpgrades = {
             new Upgrade("Sunglasses", 2, "Miner"),
-            new Upgrade("Hardhat", 2, "Miner")
+            new Upgrade("Hardhat", 2, "Miner"),
+            new Upgrade("Laser", 2, "Drill")
     };
 
     private int score;

@@ -18,5 +18,9 @@ public class Drill extends Worker{
         gc.drawImage(img, getX(), getY());
     }
 
+    public String getType(){
+        return "Drill";
+    }
+
 
 }
