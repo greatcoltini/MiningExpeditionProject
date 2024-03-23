@@ -68,10 +68,18 @@ public class Factory {
         this.pickaxe = pickaxes[getPickaxeStrength()];
     }
 
-    public void addWorker(){
-        this.decreaseScore(this.getWorkerCost());
-        Worker newWorker = new Miner(40, 40 + 10 * this.getWorkers().size());
-        this.workers.add(newWorker);
+    public void addWorker(String type) throws FileNotFoundException {
+        if (type.equalsIgnoreCase("Miner")){
+            this.decreaseScore(this.getWorkerCost("Miner"));
+            Worker newWorker = new Miner(40, 40 + 10 * this.getWorkers().size());
+            this.workers.add(newWorker);
+        }
+        else if (type.equalsIgnoreCase("Drill")){
+            this.decreaseScore(this.getWorkerCost("Drill"));
+            Worker newDrill = new Drill(60, 40 + 10 * this.getWorkers().size());
+            this.workers.add(newDrill);
+        }
+
     }
 
     public synchronized ArrayList<Worker> getWorkers() {
@@ -90,8 +98,16 @@ public class Factory {
         return this.workers.size();
     }
 
-    public int getWorkerCost(){
-        return 10 + (25 * this.workers.size());
+    public int getWorkerCost(String type){
+        if (type.equalsIgnoreCase("Miner")){
+            return 10 + (25 * this.workers.size());
+        }
+        else if (type.equalsIgnoreCase("Drill")) {
+            return 1 + (1 * this.workers.size());
+        }
+
+        return 0;
+
     }
 
     public int getPickaxeCost(){

@@ -50,7 +50,7 @@ public class MiningOperation extends Application {
     private int baseRockY = 118;
     private int oreCounterY = 160;
     private int oreCounterX = 228;
-    private final Image minebkgd = new Image(new FileInputStream("src/assets/minebkgd.jpg"));
+    private final Image minebkgd = new Image(new FileInputStream("src/assets/minebkg.gif"));
     private final Image oreBlock = new Image(new FileInputStream("src/assets/rock.PNG"));
     private final Image upgBkgd = new Image(new FileInputStream("src/assets/upgradebkg.png"));
     private final Image paperBkgd = new Image(new FileInputStream("src/assets/sheets.png"));
@@ -60,7 +60,7 @@ public class MiningOperation extends Application {
      */
     Factory rockFactory;
 
-    Button mineRockBtn, purchaseWorkerBtn, upgradePickBtn;
+    Button mineRockBtn, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn;
     Label upgradesSectionLabel, buildingsSectionLabel;
     TextField score;
 
@@ -75,9 +75,14 @@ public class MiningOperation extends Application {
         refreshView();
     }
 
-    private void purchaseWorker(ActionEvent e){
-        toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getWorkerCost(), Color.RED));
-        rockFactory.addWorker();
+    private void purchaseWorker(ActionEvent e) throws FileNotFoundException {
+        toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getWorkerCost("Miner"), Color.RED));
+        rockFactory.addWorker("Miner");
+    }
+
+    private void purchaseDrill(ActionEvent e) throws FileNotFoundException {
+        toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getWorkerCost("Drill"), Color.RED));
+        rockFactory.addWorker("Drill");
     }
 
     private void upgradePick(ActionEvent e){
@@ -103,15 +108,15 @@ public class MiningOperation extends Application {
 
     private void refreshView(){
         checkEnablers();
-        purchaseWorkerBtn.setTooltip(new Tooltip("Costs " + rockFactory.getWorkerCost()));
         upgradePickBtn.setText("Upgrade Pick : $" + rockFactory.getPickaxeCost());
-        purchaseWorkerBtn.setText("Purchase Worker : $" + rockFactory.getWorkerCost());
+        purchaseWorkerBtn.setText("Purchase Worker : $" + rockFactory.getWorkerCost("Miner"));
         score.setText(String.valueOf(rockFactory.getScore()));
     }
 
     private void checkEnablers(){
         upgradePickBtn.setDisable(rockFactory.getScore() < rockFactory.getPickaxeCost());
-        purchaseWorkerBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost());
+        purchaseWorkerBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost("Miner"));
+        purchaseDrillBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost("Drill"));
     }
 
     /**
@@ -135,6 +140,7 @@ public class MiningOperation extends Application {
         mineRockBtn = new Button("Mine!");
         score = new TextField();
         purchaseWorkerBtn = new Button("Purchase Miner!");
+        purchaseDrillBtn = new Button("Purchase Drill!");
         upgradePickBtn = new Button("Upgrade Pickaxe!");
         upgradesSectionLabel = new Label("Upgrades");
         buildingsSectionLabel = new Label("Buildings");
@@ -147,12 +153,13 @@ public class MiningOperation extends Application {
         Tooltip t = new Tooltip("Miner Sunglasses $" + rockFactory.getSpecificUpgrade("Sunglasses").getCost()
         + "\nDoubles Miner efficiency");
         Tooltip.install(test, t);
-        test.setOnMouseEntered((event) -> {test.setOpacity(0.5);});
+        test.setOnMouseEntered((event) -> {
+            test.setOpacity(0.5);});
         test.setOnMouseExited((event) -> {test.setOpacity(1);});
         test.setOnMouseClicked((event) -> {purchaseUpgrade(test, "Sunglasses");});
 
         // 3. Add components to the root
-        root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn);
+        root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn);
         root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, test);
 
         // 4. Configure the components
@@ -165,12 +172,15 @@ public class MiningOperation extends Application {
         score.relocate(oreCounterX, oreCounterY);
         score.setEditable(false);
 
-        purchaseWorkerBtn.setPrefWidth(128);
+        purchaseWorkerBtn.setPrefWidth(150);
         purchaseWorkerBtn.relocate(450, rockY);
         purchaseWorkerBtn.setDisable(true);
-        purchaseWorkerBtn.setTooltip(new Tooltip("Costs " + rockFactory.getWorkerCost()));
 
-        upgradePickBtn.setPrefWidth(128);
+        purchaseDrillBtn.setPrefWidth(150);
+        purchaseDrillBtn.relocate(450, rockY - 75);
+        purchaseDrillBtn.setDisable(true);
+
+        upgradePickBtn.setPrefWidth(150);
         upgradePickBtn.relocate(450, rockY - 32);
         upgradePickBtn.setDisable(true);
         upgradePickBtn.getStyleClass().add("bordered-title-border");
@@ -188,7 +198,20 @@ public class MiningOperation extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         mineRockBtn.setOnAction((event) -> mine(gc));
         upgradePickBtn.setOnAction(this::upgradePick);
-        purchaseWorkerBtn.setOnAction(this::purchaseWorker);
+        purchaseWorkerBtn.setOnAction(e -> {
+            try {
+                purchaseWorker(e);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        purchaseDrillBtn.setOnAction(e -> {
+            try {
+                purchaseDrill(e);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
 
 

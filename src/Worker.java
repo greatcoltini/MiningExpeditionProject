@@ -43,4 +43,8 @@ public class Worker {
         return "Worker";
     }
 
+    public void setAmount(int amount){
+        this.amount = amount;
+    }
+
 }
