@@ -1,3 +1,6 @@
+/**
+ *
+ */
 public class Upgrade {
     private String type;
     private int multiplier;

@@ -4,6 +4,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+/**
+ * The Brain for the Factory game.
+ * The Factory class contains references to Upgrades, Workers, and Pickaxe types.
+ *
+ * Within the Factory, all of our processing occurs.
+ */
 public class Factory {
     private final Pickaxe[] pickaxes = {
             new Pickaxe(1, "Hand", 0, null),
@@ -16,7 +22,7 @@ public class Factory {
     private final Upgrade[] possibleUpgrades = {
             new Upgrade("Sunglasses", 2, "Miner"),
             new Upgrade("Hardhat", 2, "Miner"),
-            new Upgrade("Laser", 2, "Drill")
+            new Upgrade("Laser", 2, "Drill", 300)
     };
 
     private int score;
@@ -70,16 +76,16 @@ public class Factory {
     }
 
     public void addWorker(String type) throws FileNotFoundException {
+        this.decreaseScore(this.getWorkerCost(type));
+        Worker newWorker = null;
+
         if (type.equalsIgnoreCase("Miner")){
-            this.decreaseScore(this.getWorkerCost("Miner"));
-            Worker newWorker = new Miner(40, 40 + 10 * this.getWorkers().size());
-            this.workers.add(newWorker);
+            newWorker = new Miner(40, 40 + 10 * this.getSpecificWorkersCount(type));
         }
         else if (type.equalsIgnoreCase("Drill")){
-            this.decreaseScore(this.getWorkerCost("Drill"));
-            Worker newDrill = new Drill(60, 40 + 10 * this.getWorkers().size());
-            this.workers.add(newDrill);
+            newWorker = new Drill(60, 40 + 10 * getSpecificWorkersCount(type));
         }
+        this.workers.add(newWorker);
 
     }
 
@@ -91,20 +97,46 @@ public class Factory {
         return this.score;
     }
 
-    public int getIncome(){
-        return getWorkerCount();
+    public int getTypeIncome(String type){
+        int income = 0;
+
+        income = getSpecificWorkersCount(type);
+
+        for (Worker worker: workers){
+            if (worker.getType().equalsIgnoreCase(type)){
+                income *= worker.getAmount();
+                break;
+            }
+        }
+
+
+
+        for (Upgrade upgrade: upgrades){
+            if (upgrade.getType().equalsIgnoreCase(type)){
+                income *= upgrade.getMultiplier();
+            }
+        }
+
+        return income;
     }
 
-    public int getWorkerCount(){
-        return this.workers.size();
+    public int getSpecificWorkersCount(String type){
+        int count = 0;
+        for (Worker worker: workers){
+            if (worker.getType().equalsIgnoreCase(type)){
+                count += 1;
+            }
+        }
+
+        return count;
     }
 
     public int getWorkerCost(String type){
         if (type.equalsIgnoreCase("Miner")){
-            return 10 + (25 * this.workers.size());
+            return 10 + (25 * getSpecificWorkersCount(type));
         }
         else if (type.equalsIgnoreCase("Drill")) {
-            return 1 + (1 * this.workers.size());
+            return 100 + (50 * getSpecificWorkersCount(type));
         }
 
         return 0;
@@ -132,7 +164,7 @@ public class Factory {
     }
 
     public boolean hasNextPickaxe(){
-        return pickaxes[this.getPickaxeStrength()] != null;
+        return pickaxes[this.getPickaxeStrength() - 1] != null;
     }
 
     public Upgrade[] getPossibleUpgrades(){

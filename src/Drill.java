@@ -5,6 +5,9 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+/**
+ * An implementation of the Drill variation of Worker.
+ */
 public class Drill extends Worker{
 
     private Image img = new Image(new FileInputStream("src/assets/drillWorker.png"));

@@ -1,6 +1,7 @@
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
@@ -12,11 +13,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -39,6 +44,7 @@ public class MiningOperation extends Application {
      */
 
     private Scene scene;
+    private boolean noClick = true;
     private Pane root;
     private ArrayList<Toast> toasts = new ArrayList<Toast>();
     private boolean shakeRock = false;
@@ -65,10 +71,13 @@ public class MiningOperation extends Application {
     Label upgradesSectionLabel, buildingsSectionLabel;
     TextField score;
 
+    UpgradeImageView laserUpgImage, sunglassesUpgImage;
+
     public MiningOperation() throws FileNotFoundException {
     }
 
     private void mine(GraphicsContext gc){
+        noClick = false;
         rockFactory.mineClick();
         toasts.add(new Toast((int) (baseRockX + Math.random() * 8)
                 , baseRockY, "Text", "+" + rockFactory.getPickaxeStrength(), Color.GOLDENROD));
@@ -87,7 +96,7 @@ public class MiningOperation extends Application {
     }
 
     private void upgradePick(ActionEvent e){
-        if (rockFactory.hasNextPickaxe()){
+        if (rockFactory.getPickaxeStrength() <= 4){
             toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
             rockFactory.upgradePickaxe();
             scene.setCursor(new ImageCursor(rockFactory.getPickaxe().getImage(), 32, 32));
@@ -111,6 +120,7 @@ public class MiningOperation extends Application {
         checkEnablers();
         upgradePickBtn.setText("Upgrade Pick : $" + rockFactory.getPickaxeCost());
         purchaseWorkerBtn.setText("Purchase Worker : $" + rockFactory.getWorkerCost("Miner"));
+        purchaseDrillBtn.setText("Purchase Drill : $" + rockFactory.getWorkerCost("Drill"));
         score.setText(String.valueOf(rockFactory.getScore()));
     }
 
@@ -146,31 +156,28 @@ public class MiningOperation extends Application {
         upgradesSectionLabel = new Label("Upgrades");
         buildingsSectionLabel = new Label("Buildings");
 
-
-        ImageView test = new ImageView(sunglassesUpg);
-        test.setPickOnBounds(true);
-        test.relocate(442, 185);
-        test.resize(16, 16);
+        UpgradeImageView sunglassesUpgImage = new UpgradeImageView(442, 185, 16, 16, sunglassesUpg);
         Tooltip t = new Tooltip("Miner Sunglasses $" + rockFactory.getSpecificUpgrade("Sunglasses").getCost()
-        + "\nDoubles Miner efficiency");
-        Tooltip.install(test, t);
-        test.setOnMouseEntered((event) -> {
-            test.setOpacity(0.5);});
-        test.setOnMouseExited((event) -> {test.setOpacity(1);});
-        test.setOnMouseClicked((event) -> {purchaseUpgrade(test, "Sunglasses");});
+                + "\nDoubles Miner efficiency");
+        Tooltip.install(sunglassesUpgImage, t);
+        sunglassesUpgImage.setOnMouseEntered((event) -> {
+            sunglassesUpgImage.setOpacity(0.5);});
+        sunglassesUpgImage.setOnMouseExited((event) -> {sunglassesUpgImage.setOpacity(1);});
+        sunglassesUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(sunglassesUpgImage, "Sunglasses");});
 
         UpgradeImageView laserUpgImage = new UpgradeImageView(490, 185, 16, 16, laserUpg);
         Tooltip las = new Tooltip("Laser Sights $" + rockFactory.getSpecificUpgrade("Laser").getCost()
-        + "\nDoubles Drill efficiency");
+                + "\nDoubles Drill efficiency");
         Tooltip.install(laserUpgImage, las);
         laserUpgImage.setOnMouseEntered((event) -> {
             laserUpgImage.setOpacity(0.5);});
         laserUpgImage.setOnMouseExited((event) -> {laserUpgImage.setOpacity(1);});
         laserUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(laserUpgImage, "Laser");});
 
+
         // 3. Add components to the root
         root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn);
-        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, test, laserUpgImage);
+        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, sunglassesUpgImage, laserUpgImage);
 
         // 4. Configure the components
         mineRockBtn.setPrefWidth(64);
@@ -183,11 +190,11 @@ public class MiningOperation extends Application {
         score.setEditable(false);
 
         purchaseWorkerBtn.setPrefWidth(150);
-        purchaseWorkerBtn.relocate(450, rockY);
+        purchaseWorkerBtn.relocate(450, 25);
         purchaseWorkerBtn.setDisable(true);
 
         purchaseDrillBtn.setPrefWidth(150);
-        purchaseDrillBtn.relocate(450, rockY - 75);
+        purchaseDrillBtn.relocate(450, 50);
         purchaseDrillBtn.setDisable(true);
 
         upgradePickBtn.setPrefWidth(150);
@@ -195,12 +202,15 @@ public class MiningOperation extends Application {
         upgradePickBtn.setDisable(true);
         upgradePickBtn.getStyleClass().add("bordered-title-border");
 
-        upgradesSectionLabel.setPrefSize(200, 50);
-        upgradesSectionLabel.relocate(450, 150);
+        upgradesSectionLabel.setPrefSize(150, 25);
+        upgradesSectionLabel.relocate(450, 160);
         upgradesSectionLabel.getStyleClass().add("border-item");
+        upgradesSectionLabel.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        buildingsSectionLabel.setPrefSize(200, 50);
+        buildingsSectionLabel.setPrefSize(150, 25);
         buildingsSectionLabel.relocate(450, 0);
+        buildingsSectionLabel.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
 
         // 5. Add Listeners
         stage.setScene(scene);
@@ -208,6 +218,7 @@ public class MiningOperation extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         mineRockBtn.setOnAction((event) -> mine(gc));
         upgradePickBtn.setOnAction(this::upgradePick);
+
         purchaseWorkerBtn.setOnAction(e -> {
             try {
                 purchaseWorker(e);
@@ -236,16 +247,35 @@ public class MiningOperation extends Application {
                     if (timer >= 10) {
                         income = rockFactory.miningOperation();
                         timer = 0;
+
+                        // create toasts for income amounts
+                        // draw the income generated from the workers
+                        if (rockFactory.getSpecificWorkersCount("Miner") > 0){
+                            Toast incomeGen = new Toast((int) (baseRockX - Math.random() * 50), baseRockY, "Text", "+" + rockFactory.getTypeIncome("Miner"), Color.GREEN);
+                            toasts.add(incomeGen);
+                        }
+
+                        if (rockFactory.getSpecificWorkersCount("Drill") > 0){
+                            Toast incomeGen = new Toast((int) (baseRockX + Math.random() * 20), baseRockY, "Text", "+" + rockFactory.getTypeIncome("Drill"), Color.STEELBLUE);
+                            toasts.add(incomeGen);
+                        }
                     }
 
                     refreshView();
 
 
                     gc.clearRect(0, 0, 600, 300);
+
+
                     gc.drawImage(minebkgd, 0,0, 600, 300);
                     // Redraw income
                     gc.drawImage(paperBkgd, 0, 0, 100, 200);
                     gc.strokeText("Income per Second: " + income, 235, 200);
+
+                    // initial instructions before user clicks on the rock
+                    if (noClick){
+                        gc.strokeText("Click on the rock to mine ore.", 195, 115);
+                    }
 
                     if (shakeRock) {
                         gc.drawImage(oreBlock, rockX + Math.random(), rockY + Math.random());
