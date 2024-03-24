@@ -43,19 +43,28 @@ public class MiningOperation extends Application {
      *
      */
 
+    /** initializes the scene for access elsewhere **/
     private Scene scene;
+    /** Boolean to display instructions if user has not acted **/
     private boolean noClick = true;
+    /** initializes the root for access elsewhere **/
     private Pane root;
+    /** an array of toasts for animation **/
     private ArrayList<Toast> toasts = new ArrayList<Toast>();
+    /** boolean to detect whether the rock has been hit **/
     private boolean shakeRock = false;
+    /** timer **/
     private int timer = 0;
+    /** initializes the X value of the rock img **/
     private int rockX = 268;
+    /** tracker for the income generated **/
     private int income;
-    private int baseRockX = 268;
+    /** initializes the Y value of the rock img **/
     private int rockY = 118;
-    private int baseRockY = 118;
+    /** Y and X values for the income tracker **/
     private int oreCounterY = 160;
     private int oreCounterX = 228;
+    /** initialization of various images used for the project **/
     private final Image minebkgd = new Image(new FileInputStream("src/assets/minebkg.gif"));
     private final Image oreBlock = new Image(new FileInputStream("src/assets/rock.PNG"));
     private final Image upgBkgd = new Image(new FileInputStream("src/assets/upgradebkg.png"));
@@ -63,10 +72,14 @@ public class MiningOperation extends Application {
     private final Image sunglassesUpg = new Image(new FileInputStream("src/assets/sunglassesUpgrade.png"));
     private final Image laserUpg = new Image(new FileInputStream("src/assets/laserUpgrade.png"));
     /**
-     *
+     * The below generates the rock factory for the game to run the logic with
      */
     Factory rockFactory;
 
+    /**
+     * The below creates the buttons, labels, textfield, and UpgradeImageViews
+     * for the graphical representation of the game.
+     */
     Button mineRockBtn, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn;
     Label upgradesSectionLabel, buildingsSectionLabel;
     TextField score;
@@ -79,25 +92,25 @@ public class MiningOperation extends Application {
     private void mine(GraphicsContext gc){
         noClick = false;
         rockFactory.mineClick();
-        toasts.add(new Toast((int) (baseRockX + Math.random() * 8)
-                , baseRockY, "Text", "+" + rockFactory.getPickaxeStrength(), Color.GOLDENROD));
+        toasts.add(new Toast((int) (rockX + Math.random() * 8)
+                , rockY, "Text", "+" + rockFactory.getPickaxeStrength(), Color.GOLDENROD));
         shakeRock = true;
         refreshView();
     }
 
     private void purchaseWorker(ActionEvent e) throws FileNotFoundException {
-        toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getWorkerCost("Miner"), Color.RED));
+        toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getWorkerCost("Miner"), Color.RED));
         rockFactory.addWorker("Miner");
     }
 
     private void purchaseDrill(ActionEvent e) throws FileNotFoundException {
-        toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getWorkerCost("Drill"), Color.RED));
+        toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getWorkerCost("Drill"), Color.RED));
         rockFactory.addWorker("Drill");
     }
 
     private void upgradePick(ActionEvent e){
         if (rockFactory.getPickaxeStrength() <= 4){
-            toasts.add(new Toast(baseRockX, baseRockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
+            toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
             rockFactory.upgradePickaxe();
             scene.setCursor(new ImageCursor(rockFactory.getPickaxe().getImage(), 32, 32));
             refreshView();
@@ -111,7 +124,7 @@ public class MiningOperation extends Application {
             root.getChildren().remove(img);
         }
         else {
-            toasts.add(new Toast(baseRockX, baseRockY, "Text", "Need " + missing_price, Color.PURPLE));
+            toasts.add(new Toast(rockX, rockY, "Text", "Need " + missing_price, Color.PURPLE));
         }
 
     }
@@ -156,23 +169,8 @@ public class MiningOperation extends Application {
         upgradesSectionLabel = new Label("Upgrades");
         buildingsSectionLabel = new Label("Buildings");
 
-        UpgradeImageView sunglassesUpgImage = new UpgradeImageView(442, 185, 16, 16, sunglassesUpg);
-        Tooltip t = new Tooltip("Miner Sunglasses $" + rockFactory.getSpecificUpgrade("Sunglasses").getCost()
-                + "\nDoubles Miner efficiency");
-        Tooltip.install(sunglassesUpgImage, t);
-        sunglassesUpgImage.setOnMouseEntered((event) -> {
-            sunglassesUpgImage.setOpacity(0.5);});
-        sunglassesUpgImage.setOnMouseExited((event) -> {sunglassesUpgImage.setOpacity(1);});
-        sunglassesUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(sunglassesUpgImage, "Sunglasses");});
+        generateUpgrades();
 
-        UpgradeImageView laserUpgImage = new UpgradeImageView(490, 185, 16, 16, laserUpg);
-        Tooltip las = new Tooltip("Laser Sights $" + rockFactory.getSpecificUpgrade("Laser").getCost()
-                + "\nDoubles Drill efficiency");
-        Tooltip.install(laserUpgImage, las);
-        laserUpgImage.setOnMouseEntered((event) -> {
-            laserUpgImage.setOpacity(0.5);});
-        laserUpgImage.setOnMouseExited((event) -> {laserUpgImage.setOpacity(1);});
-        laserUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(laserUpgImage, "Laser");});
 
 
         // 3. Add components to the root
@@ -251,12 +249,12 @@ public class MiningOperation extends Application {
                         // create toasts for income amounts
                         // draw the income generated from the workers
                         if (rockFactory.getSpecificWorkersCount("Miner") > 0){
-                            Toast incomeGen = new Toast((int) (baseRockX - Math.random() * 50), baseRockY, "Text", "+" + rockFactory.getTypeIncome("Miner"), Color.GREEN);
+                            Toast incomeGen = new Toast((int) (rockX - Math.random() * 50), rockY, "Text", "+" + rockFactory.getTypeIncome("Miner"), Color.GREEN);
                             toasts.add(incomeGen);
                         }
 
                         if (rockFactory.getSpecificWorkersCount("Drill") > 0){
-                            Toast incomeGen = new Toast((int) (baseRockX + Math.random() * 20), baseRockY, "Text", "+" + rockFactory.getTypeIncome("Drill"), Color.STEELBLUE);
+                            Toast incomeGen = new Toast((int) (rockX + Math.random() * 20), rockY, "Text", "+" + rockFactory.getTypeIncome("Drill"), Color.STEELBLUE);
                             toasts.add(incomeGen);
                         }
                     }
@@ -281,7 +279,7 @@ public class MiningOperation extends Application {
                         gc.drawImage(oreBlock, rockX + Math.random(), rockY + Math.random());
                         shakeRock = false;
                     } else {
-                        gc.drawImage(oreBlock, baseRockX, baseRockY);
+                        gc.drawImage(oreBlock, rockX, rockY);
                     }
 
                     gc.drawImage(upgBkgd, 410, 185, 32, 32);
@@ -320,6 +318,30 @@ public class MiningOperation extends Application {
             Thread.sleep(duration);
         } catch (InterruptedException ex) {
         }
+    }
+
+    /**
+     * This method generates the upgrade icons and functionality
+     */
+    private void generateUpgrades(){
+        sunglassesUpgImage = new UpgradeImageView(442, 185, 16, 16, sunglassesUpg);
+        Tooltip t = new Tooltip("Miner Sunglasses $" + rockFactory.getSpecificUpgrade("Sunglasses").getCost()
+                + "\nDoubles Miner efficiency");
+        Tooltip.install(sunglassesUpgImage, t);
+        sunglassesUpgImage.setOnMouseEntered((event) -> {
+            sunglassesUpgImage.setOpacity(0.5);});
+        sunglassesUpgImage.setOnMouseExited((event) -> {sunglassesUpgImage.setOpacity(1);});
+        sunglassesUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(sunglassesUpgImage, "Sunglasses");});
+
+        laserUpgImage = new UpgradeImageView(490, 185, 16, 16, laserUpg);
+        Tooltip las = new Tooltip("Laser Sights $" + rockFactory.getSpecificUpgrade("Laser").getCost()
+                + "\nDoubles Drill efficiency");
+        Tooltip.install(laserUpgImage, las);
+        laserUpgImage.setOnMouseEntered((event) -> {
+            laserUpgImage.setOpacity(0.5);});
+        laserUpgImage.setOnMouseExited((event) -> {laserUpgImage.setOpacity(1);});
+        laserUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(laserUpgImage, "Laser");});
+
     }
 
     /**
