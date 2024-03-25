@@ -62,7 +62,7 @@ public class MiningOperation extends Application {
     private final Image minebkgd = new Image(new FileInputStream("src/assets/minebkg.gif"));
     private final Image oreBlock = new Image(new FileInputStream("src/assets/rock.PNG"));
     private final Image upgBkgd = new Image(new FileInputStream("src/assets/upgradebkg.png"));
-    private final Image paperBkgd = new Image(new FileInputStream("src/assets/sheets.png"));
+    private final Image paperBkgd = new Image(new FileInputStream("src/assets/buildings.png"));
     private final Image sunglassesUpg = new Image(new FileInputStream("src/assets/sunglassesUpgrade.png"));
     private final Image laserUpg = new Image(new FileInputStream("src/assets/laserUpgrade.png"));
     /**
@@ -74,11 +74,11 @@ public class MiningOperation extends Application {
      * The below creates the buttons, labels, textfield, and UpgradeImageViews
      * for the graphical representation of the game.
      */
-    Button mineRockBtn, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn;
+    Button mineRockBtn, purchaseWorkerBtn, purchaseDrillBtn;
     Label upgradesSectionLabel, buildingsSectionLabel;
     TextField score;
 
-    UpgradeImageView laserUpgImage, sunglassesUpgImage;
+    UpgradeImageView laserUpgImage, sunglassesUpgImage, pickaxeUpgImage;
 
     /**
      * Throws an issue
@@ -126,12 +126,22 @@ public class MiningOperation extends Application {
      * @param e
      */
     private void upgradePick(ActionEvent e){
-        if (rockFactory.getPickaxeStrength() <= 4){
-            toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
-            rockFactory.upgradePickaxe();
-            scene.setCursor(new ImageCursor(rockFactory.getPickaxe().getImage(), 32, 32));
-            refreshView();
+        int missing_price = rockFactory.getPickaxeCost() - rockFactory.getScore();
+        if (missing_price <= 0) {
+            if (rockFactory.getPickaxeStrength() == 4){
+                root.getChildren().remove(pickaxeUpgImage);
+            }
+            if (rockFactory.getPickaxeStrength() <= 4){
+                toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
+                rockFactory.upgradePickaxe();
+                pickaxeUpgImage.setImage(rockFactory.getNextPickaxe().getImage());
+                refreshView();
+            }
         }
+        else {
+            toasts.add(new Toast(rockX, rockY, "Text", "Need " + missing_price, Color.PURPLE));
+        }
+
     }
 
     /**
@@ -156,7 +166,6 @@ public class MiningOperation extends Application {
      */
     private void refreshView(){
         checkEnablers();
-        upgradePickBtn.setText("Upgrade Pick : $" + rockFactory.getPickaxeCost());
         purchaseWorkerBtn.setText("Purchase Worker : $" + rockFactory.getWorkerCost("Miner"));
         purchaseDrillBtn.setText("Purchase Drill : $" + rockFactory.getWorkerCost("Drill"));
         score.setText(String.valueOf(rockFactory.getScore()));
@@ -166,7 +175,6 @@ public class MiningOperation extends Application {
      * Checks the states of each of the purchase buttons
      */
     private void checkEnablers(){
-        upgradePickBtn.setDisable(rockFactory.getScore() < rockFactory.getPickaxeCost());
         purchaseWorkerBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost("Miner"));
         purchaseDrillBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost("Drill"));
     }
@@ -193,7 +201,6 @@ public class MiningOperation extends Application {
         score = new TextField();
         purchaseWorkerBtn = new Button("Purchase Miner!");
         purchaseDrillBtn = new Button("Purchase Drill!");
-        upgradePickBtn = new Button("Upgrade Pickaxe!");
         upgradesSectionLabel = new Label("Upgrades");
         buildingsSectionLabel = new Label("Buildings");
 
@@ -202,8 +209,8 @@ public class MiningOperation extends Application {
 
 
         // 3. Add components to the root
-        root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, upgradePickBtn, purchaseDrillBtn);
-        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, sunglassesUpgImage, laserUpgImage);
+        root.getChildren().addAll(canvas, mineRockBtn, score, purchaseWorkerBtn, purchaseDrillBtn);
+        root.getChildren().addAll(upgradesSectionLabel, buildingsSectionLabel, sunglassesUpgImage, laserUpgImage, pickaxeUpgImage);
 
         // 4. Configure the components
         mineRockBtn.setPrefWidth(64);
@@ -223,11 +230,6 @@ public class MiningOperation extends Application {
         purchaseDrillBtn.relocate(450, 50);
         purchaseDrillBtn.setDisable(true);
 
-        upgradePickBtn.setPrefWidth(150);
-        upgradePickBtn.relocate(450, rockY - 32);
-        upgradePickBtn.setDisable(true);
-        upgradePickBtn.getStyleClass().add("bordered-title-border");
-
         upgradesSectionLabel.setPrefSize(150, 25);
         upgradesSectionLabel.relocate(450, 160);
         upgradesSectionLabel.getStyleClass().add("border-item");
@@ -243,7 +245,6 @@ public class MiningOperation extends Application {
         stage.show();
         GraphicsContext gc = canvas.getGraphicsContext2D();
         mineRockBtn.setOnAction((event) -> mine());
-        upgradePickBtn.setOnAction(this::upgradePick);
 
         purchaseWorkerBtn.setOnAction(e -> {
             try {
@@ -295,7 +296,7 @@ public class MiningOperation extends Application {
 
                     gc.drawImage(minebkgd, 0,0, 600, 300);
                     // Redraw income
-                    gc.drawImage(paperBkgd, 0, 0, 100, 200);
+                    gc.drawImage(paperBkgd, 0, 0, 150, 300);
                     gc.strokeText("Income per Second: " + income, oreCounterX, 290);
 
                     // initial instructions before user clicks on the rock
@@ -369,6 +370,15 @@ public class MiningOperation extends Application {
             laserUpgImage.setOpacity(0.5);});
         laserUpgImage.setOnMouseExited((event) -> {laserUpgImage.setOpacity(1);});
         laserUpgImage.setOnMouseClicked((event) -> {purchaseUpgrade(laserUpgImage, "Laser");});
+
+        pickaxeUpgImage = new UpgradeImageView(538, 185, 16, 16, rockFactory.getNextPickaxe().getImage());
+        Tooltip pick = new Tooltip("Pickaxe Upgrade $" + rockFactory.getNextPickaxe().getCost() +
+                "\nDoubles Clicking effectiveness");
+        Tooltip.install(pickaxeUpgImage, pick);
+        pickaxeUpgImage.setOnMouseEntered((event) -> {
+            pickaxeUpgImage.setOpacity(0.5);});
+        pickaxeUpgImage.setOnMouseExited((event) -> {pickaxeUpgImage.setOpacity(1);});
+        pickaxeUpgImage.setOnMouseClicked((event) -> {upgradePick(null);});
 
     }
 

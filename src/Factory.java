@@ -16,10 +16,10 @@ public class Factory {
     /** An array of Pickaxes **/
     private final Pickaxe[] pickaxes = {
             new Pickaxe(1, "Hand", 0, null),
-            new Pickaxe(2, "Stone", 25, new Image(new FileInputStream("src/assets/rpg-items-all/stone pick.png"))),
-            new Pickaxe(3, "Bronze", 50, new Image(new FileInputStream("src/assets/rpg-items-all/bronze pick.png"))),
-            new Pickaxe(4, "Iron", 100, new Image(new FileInputStream("src/assets/rpg-items-all/iron pick.png"))),
-            new Pickaxe(5, "Steel", 200, new Image(new FileInputStream("src/assets/rpg-items-all/steel pick.png")))
+            new Pickaxe(2, "Stone", 25, new Image(new FileInputStream("src/assets/stone pick.png"))),
+            new Pickaxe(3, "Bronze", 50, new Image(new FileInputStream("src/assets/bronze pick.png"))),
+            new Pickaxe(4, "Iron", 100, new Image(new FileInputStream("src/assets/iron pick.png"))),
+            new Pickaxe(5, "Steel", 200, new Image(new FileInputStream("src/assets/steel pick.png")))
     };
 
     /** An array of possible upgrades **/
@@ -113,10 +113,10 @@ public class Factory {
         Worker newWorker = null;
 
         if (type.equalsIgnoreCase("Miner")){
-            newWorker = new Miner(40, 40 + 10 * this.getSpecificWorkersCount(type));
+            newWorker = new Miner(15, 35 + 10 * this.getSpecificWorkersCount(type));
         }
         else if (type.equalsIgnoreCase("Drill")){
-            newWorker = new Drill(60, 40 + 10 * getSpecificWorkersCount(type));
+            newWorker = new Drill(15, 115 + 10 * getSpecificWorkersCount(type));
         }
         this.workers.add(newWorker);
 
