@@ -48,7 +48,7 @@ public class Factory {
      * @throws FileNotFoundException
      */
     public Factory() throws FileNotFoundException {
-        this.score = 0;
+        this.score = 600;
         this.multiplier = 1;
         this.pickaxe = pickaxes[0];
         this.workers = new ArrayList<Worker>();
@@ -202,7 +202,10 @@ public class Factory {
      * @return
      */
     public int getPickaxeCost(){
-        return getNextPickaxe().getCost();
+        if (getNextPickaxe() != null){
+            return getNextPickaxe().getCost();
+        }
+        else {return 0;}
     }
 
     /**
@@ -222,19 +225,14 @@ public class Factory {
     }
 
     /**
-     * Returns a Pickaxe object representing the pick the player currently has.
-     * @return Pickaxe object representing the current pickaxe
-     */
-    public Pickaxe getPickaxe(){
-        return this.pickaxe;
-    }
-
-    /**
      * Returns the next possible pickaxe, from our array of pickaxe objects
      * @return Pickaxe object representing the next possible purchaseable pickaxe
      */
     public Pickaxe getNextPickaxe(){
-        return pickaxes[this.getPickaxeStrength()];
+        if (this.getPickaxeStrength() < 5){
+            return pickaxes[this.getPickaxeStrength()];
+        }
+        return null;
     }
 
     public Upgrade[] getPossibleUpgrades(){
