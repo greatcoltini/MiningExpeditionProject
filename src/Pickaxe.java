@@ -2,6 +2,8 @@ import javafx.scene.image.Image;
 
 /**
  * This class is an implementation of a Pickaxe.
+ *
+ * @author Colton Donkersgoed
  */
 public class Pickaxe {
     /** Initialization of the variables for the pickaxe class **/

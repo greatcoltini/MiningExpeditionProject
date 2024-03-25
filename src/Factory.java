@@ -11,7 +11,6 @@ import java.util.ArrayList;
  *
  * @author Colton Donkersgoed
  *
- * TODO: Docstring
  */
 public class Factory {
     /** An array of Pickaxes **/

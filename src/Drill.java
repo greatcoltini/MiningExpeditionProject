@@ -26,6 +26,7 @@ public class Drill extends Worker{
     public Drill (int x, int y) throws FileNotFoundException {
         super(x, y);
         this.setAmount(5);
+        this.setType("Drill");
     }
 
     /**
@@ -34,14 +35,6 @@ public class Drill extends Worker{
      */
     public void draw(GraphicsContext gc){
         gc.drawImage(img, getX(), getY());
-    }
-
-    /**
-     * Returns the type of the Worker
-     * @return String: the String representing the class
-     */
-    public String getType(){
-        return "Drill";
     }
 
 

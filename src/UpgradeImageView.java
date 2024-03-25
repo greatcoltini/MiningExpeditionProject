@@ -4,6 +4,8 @@ import javafx.scene.image.ImageView;
 /**
  * This is a custom ImageView class for upgrades. In our constructor we require an image,
  * and then assign that it can be clicked.
+ *
+ * @author Colton Donkersgoed
  */
 public class UpgradeImageView extends ImageView {
 

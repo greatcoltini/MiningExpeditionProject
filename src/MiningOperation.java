@@ -50,12 +50,13 @@ public class MiningOperation extends Application {
     private int timer = 0;
     /** initializes the X value of the rock img **/
     private int rockX = 268;
+    /** initializes the Y value of the rock img **/
+    private int rockY = 200;
     /** tracker for the income generated **/
     private int income;
-    /** initializes the Y value of the rock img **/
-    private int rockY = 118;
+
     /** Y and X values for the income tracker **/
-    private int oreCounterY = 160;
+    private int oreCounterY = 250;
     private int oreCounterX = 228;
     /** initialization of various images used for the project **/
     private final Image minebkgd = new Image(new FileInputStream("src/assets/minebkg.gif"));
@@ -295,7 +296,7 @@ public class MiningOperation extends Application {
                     gc.drawImage(minebkgd, 0,0, 600, 300);
                     // Redraw income
                     gc.drawImage(paperBkgd, 0, 0, 100, 200);
-                    gc.strokeText("Income per Second: " + income, 235, 200);
+                    gc.strokeText("Income per Second: " + income, oreCounterX, 290);
 
                     // initial instructions before user clicks on the rock
                     if (noClick){
