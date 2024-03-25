@@ -36,10 +36,6 @@ import java.util.TimerTask;
  */
 public class MiningOperation extends Application {
 
-    /**
-     *
-     */
-
     /** initializes the scene for access elsewhere **/
     private Scene scene;
     /** Boolean to display instructions if user has not acted **/

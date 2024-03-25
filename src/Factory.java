@@ -10,6 +10,8 @@ import java.util.ArrayList;
  * Within the Factory, all of our processing occurs.
  *
  * @author Colton Donkersgoed
+ *
+ * TODO: Docstring
  */
 public class Factory {
     /** An array of Pickaxes **/
