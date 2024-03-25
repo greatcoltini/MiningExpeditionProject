@@ -30,12 +30,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Use this template to create simple animations in FX. Change the name of the
- * class and put your own name as author below. Change the size of the canvas
- * and the window title where marked and add your drawing code in the animation
- * method where shown.
+ * This is the main file for the Mining Operation game.
  *
- * @author YOUR NAME
+ * @author Colton Donkersgoed
  */
 public class MiningOperation extends Application {
 
@@ -86,10 +83,17 @@ public class MiningOperation extends Application {
 
     UpgradeImageView laserUpgImage, sunglassesUpgImage;
 
+    /**
+     * Throws an issue
+     * @throws FileNotFoundException
+     */
     public MiningOperation() throws FileNotFoundException {
     }
 
-    private void mine(GraphicsContext gc){
+    /**
+     * Adds some mining value and creates a toast request
+     */
+    private void mine(){
         noClick = false;
         rockFactory.mineClick();
         toasts.add(new Toast((int) (rockX + Math.random() * 8)
@@ -98,16 +102,32 @@ public class MiningOperation extends Application {
         refreshView();
     }
 
+    /**
+     * Purchases a Miner for income generation, adding it to the factory.
+     * @param e
+     * @throws FileNotFoundException
+     */
     private void purchaseWorker(ActionEvent e) throws FileNotFoundException {
         toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getWorkerCost("Miner"), Color.RED));
         rockFactory.addWorker("Miner");
     }
 
+    /**
+     * Purchases a Drill for income generation, adding it to the factory.
+     * @param e
+     * @throws FileNotFoundException: errors if there is no image file found.
+     */
     private void purchaseDrill(ActionEvent e) throws FileNotFoundException {
         toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getWorkerCost("Drill"), Color.RED));
         rockFactory.addWorker("Drill");
     }
 
+    /**
+     * Upgrades the pickaxe
+     *
+     * TODO: CHANGE THIS LATER
+     * @param e
+     */
     private void upgradePick(ActionEvent e){
         if (rockFactory.getPickaxeStrength() <= 4){
             toasts.add(new Toast(rockX, rockY, "Text", "-" + rockFactory.getPickaxeCost(), Color.RED));
@@ -117,6 +137,11 @@ public class MiningOperation extends Application {
         }
     }
 
+    /**
+     * Purchases the upgrade for the factory, or sends a toast if it fails.
+     * @param img: the image for the upgrade
+     * @param upgradeName: the name of the upgrade
+     */
     private void purchaseUpgrade(ImageView img, String upgradeName){
         int missing_price = rockFactory.getSpecificUpgrade(upgradeName).getCost() - rockFactory.getScore();
         if (missing_price <= 0){
@@ -129,6 +154,9 @@ public class MiningOperation extends Application {
 
     }
 
+    /**
+     * Refreshes all the GUI elements that update based on various parameters
+     */
     private void refreshView(){
         checkEnablers();
         upgradePickBtn.setText("Upgrade Pick : $" + rockFactory.getPickaxeCost());
@@ -137,6 +165,9 @@ public class MiningOperation extends Application {
         score.setText(String.valueOf(rockFactory.getScore()));
     }
 
+    /**
+     * Checks the states of each of the purchase buttons
+     */
     private void checkEnablers(){
         upgradePickBtn.setDisable(rockFactory.getScore() < rockFactory.getPickaxeCost());
         purchaseWorkerBtn.setDisable(rockFactory.getScore() < rockFactory.getWorkerCost("Miner"));
@@ -214,7 +245,7 @@ public class MiningOperation extends Application {
         stage.setScene(scene);
         stage.show();
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        mineRockBtn.setOnAction((event) -> mine(gc));
+        mineRockBtn.setOnAction((event) -> mine());
         upgradePickBtn.setOnAction(this::upgradePick);
 
         purchaseWorkerBtn.setOnAction(e -> {
@@ -234,7 +265,7 @@ public class MiningOperation extends Application {
 
 
 
-
+        // generates the timer to redraw the canvas every 1/10 of a second
         Timer gameLoop = new Timer();
         gameLoop.schedule(new TimerTask() {
             @Override
@@ -321,7 +352,7 @@ public class MiningOperation extends Application {
     }
 
     /**
-     * This method generates the upgrade icons and functionality
+     * This method generates the upgrade icons and functionality on the GUI
      */
     private void generateUpgrades(){
         sunglassesUpgImage = new UpgradeImageView(442, 185, 16, 16, sunglassesUpg);

@@ -1,5 +1,6 @@
 /**
  *
+ * @author Colton Donkersgoed
  */
 public class Upgrade {
     private String type;

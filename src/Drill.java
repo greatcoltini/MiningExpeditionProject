@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 
 /**
  * An implementation of the Drill variation of Worker.
+ *
+ * @author Colton Donkersgoed
  */
 public class Drill extends Worker{
 

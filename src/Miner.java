@@ -1,6 +1,10 @@
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+/**
+ *
+ * @author Colton Donkersgoed
+ */
 public class Miner extends Worker{
 
     public Miner(int x, int y){
