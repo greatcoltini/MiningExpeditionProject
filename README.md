@@ -15,3 +15,5 @@ Created proper DocStrings as per recommended documentation standards for Java pr
 
 Utilized the JavaFX Library to render the graphics elements on the screen.
 
+
+![image](https://github.com/greatcoltini/MiningExpeditionProject/assets/18517181/0022ba2a-84ec-46f3-a899-bec4efdc1d51)
