@@ -10,3 +10,8 @@ The purpose of this project was to explore the usage of inheritance, association
 ## Presentation
 
 Created proper DocStrings as per recommended documentation standards for Java projects. From these docstrings, generated HTML JavaDoc files using the IntelliJ IDE.
+
+## Libraries
+
+Utilized the JavaFX Library to render the graphics elements on the screen.
+
